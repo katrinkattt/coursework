@@ -1,56 +1,99 @@
-import { makeStyles } from '@material-ui/core/styles';
-import Card from '@material-ui/core/Card';
-import CardActions from '@material-ui/core/CardActions';
-import CardContent from '@material-ui/core/CardContent';
-import Typography from '@material-ui/core/Typography';
-import { Btn } from '../btn';
+import {
+  componentColor,
+  fontTitleColor,
+  primaryColor,
+} from '../../style/const';
+import { Box } from '@material-ui/core';
+import React from 'react';
 
-const useStyles = makeStyles({
-  root: {
-    minWidth: 275,
-  },
-  bullet: {
-    display: 'inline-block',
-    margin: '0 2px',
-    transform: 'scale(0.8)',
-  },
-  title: {
-    fontSize: 14,
-  },
-  pos: {
-    marginBottom: 12,
-  },
-});
-
-export default function SimpleCard(price) {
-  const classes = useStyles();
-  const bull = <span className={classes.bullet}>•</span>;
-
+const Element = ({ title, text }) => (
+  <div style={{ width: '30%', marginLeft: -10 }}>
+    <p
+      style={{
+        fontSize: 12,
+        fontWeight: '600',
+        height: '10%',
+        textTransform: 'uppercase',
+      }}
+    >
+      {title}
+    </p>
+    <p
+      style={{
+        fontSize: 12,
+        fontWeight: '600',
+        color: fontTitleColor,
+        height: '10%',
+        marginLeft: 4,
+      }}
+    >
+      {text}
+    </p>
+  </div>
+);
+export const Item = ({ ticket }) => {
+  const getTimeFromMin = (mins) => {
+    let hours = Math.trunc(mins / 60);
+    let minutes = mins % 60;
+    return hours + 'ч ' + minutes + 'м';
+  };
   return (
-    <Card className={classes.root}>
-      <CardContent>
-        <Typography
-          className={classes.title}
-          color="textSecondary"
-          gutterBottom
+    <Box
+      boxShadow={2}
+      style={{
+        backgroundColor: componentColor,
+        height: 180,
+        width: '100%',
+        borderRadius: 5,
+        marginBottom: 20,
+      }}
+    >
+      <Box display="flex" flexDirection="row">
+        <Box p={1} mr={50} ml={3} mt={-1} flexShrink={0}>
+          <p
+            style={{
+              fontSize: 20,
+              fontWeight: '500',
+              color: primaryColor,
+            }}
+          >
+            {`${ticket.price} ₽`}
+          </p>
+        </Box>
+        <Box p={1} mt={1} flexShrink={0}>
+          {/*<img src="/images/logo.png" />*/}
+        </Box>
+      </Box>
+      {ticket.segments.map((segment) => (
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'row',
+            marginTop: -16,
+          }}
         >
-          Word of the Day
-        </Typography>
-        <Typography variant="h5" component="h2">
-          be{bull}nev{bull}o{bull}lent
-        </Typography>
-        <Typography className={classes.pos} color="textSecondary">
-          adjective
-        </Typography>
-        <Typography variant="body2" component="p">
-          well meaning and kindly.
-          <br />
-          {'"a benevolent smile"'}
-        </Typography>
-      </CardContent>
-      <CardActions>
-        <Btn text={price} />
-      </CardActions>
-    </Card>
+          <Element
+            title={`${segment.origin} - 
+            ${segment.destination}`}
+            text={`${segment.date.replace(/.*T/, '').replace(/:00.000.*/, '')}`}
+          />
+          <Element title="В пути" text={getTimeFromMin(segment.duration)} />
+          <Element
+            title={
+              segment.stops.length !== 0
+                ? segment.stops.length === 1
+                  ? '1 пересадка'
+                  : `${segment.stops.length} пересадки`
+                : 'без пересадoк'
+            }
+            text={
+              segment.stops.length > 0
+                ? segment.stops.map((stop) => `${stop} `)
+                : ''
+            }
+          />
+        </div>
+      ))}
+    </Box>
   );
-}
+};
